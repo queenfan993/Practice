@@ -73,7 +73,7 @@ void ArrayMatching(char * strArr[], int arrLength) {
 int main(void) { 
   char matrix[][100] = {
     "[1, 2, 5, 6, 50]",
-    "[5, 2, 8, 11111, 60, 70]"
+    "[5, 2, 8, 11111, 60, 70, 80, 90, 100, 101]"
   };
   char* A[] = { matrix[0], matrix[1]};
   // keep this function call here

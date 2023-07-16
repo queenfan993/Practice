@@ -10,10 +10,17 @@ typedef struct Node {
 
 node* createNode(char* str) {
     node* temp = (node*)calloc(1, sizeof(node));
-    temp -> val = strdup(str);
+    char* x = (char*)calloc(strlen(str) + 1, sizeof(char));
+    strcpy(x, str);
+    temp -> val = x;
     temp -> next = NULL;
     temp -> prev = NULL;
     return temp;
+}
+
+void freeNode(node* temp) {
+  free(temp -> val);
+  free(temp);
 }
 
 void addNodeFromTail(node* tail, char* str) {
@@ -36,6 +43,7 @@ void removeNode(node* head, char* str) {
             if (temp->next != NULL) {
                 temp->next->prev = temp->prev;
             }
+            freeNode(temp);
             break;
         }
         temp = temp->next;
@@ -101,17 +109,18 @@ int main(void) {
   };
   char * A[] = {matrix[0], matrix[1], matrix[2], matrix[3], matrix[4], matrix[5], matrix[6]};
   */
-  /*
+  
   char matrix[][20] = {
-    "A", "B",
+    "A", "A", "A", "A"
   };
-  char * A[] = {matrix[0], matrix[1]};
-  */
+  char * A[] = {matrix[0], matrix[1], matrix[2], matrix[3]};
+  
+  /*
   char matrix[][20] = {
     "A", "B", "C", "D", "E", "D", "Q", "Z", "C"
   };
   char * A[] = {matrix[0], matrix[1], matrix[2], matrix[3], matrix[4], matrix[5], matrix[6], matrix[7], matrix[8]};
-
+  */
   //char * A[] = coderbyteInternalStdinFunction(stdin);
   int arrLength = sizeof(A) / sizeof(*A);
   LRUCache(A, arrLength);
