@@ -17,7 +17,7 @@ int rat;
 int & rodents;
 rodent = rat; // cant!!!
 ```
-- 另外引用並不能，透過轉換改變地址，永遠都是只像第一次引用的對象，
+- 另外引用並不能，透過轉換改變地址，永遠都是指向第一次引用的對象，
 ```
 int rats = 100;
 int & rodents = rats;
