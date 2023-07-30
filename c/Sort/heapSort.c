@@ -1,13 +1,11 @@
 #include <stdio.h>
 
-// 交換兩個元素的值
 void swap(int* a, int* b) {
     int temp = *a;
     *a = *b;
     *b = temp;
 }
 
-// 將陣列轉換為最大堆結構
 void heapify(int arr[], int size, int root) {
     int largest = root; 
     int left = 2 * root + 1; 

@@ -1,6 +1,5 @@
 #include <stdio.h>
 
-// 合併兩個子陣列
 void merge(int arr[], int left[], int left_size, int right[], int right_size) {
     int i = 0, j = 0, k = 0;
 
