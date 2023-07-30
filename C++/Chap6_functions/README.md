@@ -43,6 +43,7 @@ double refcub(double &a);
 double x = 5.0;
 recub(x + 2.0);
 ```
+
 # 6.4 Overloaded 
 - 重點就是函數名稱相同，但是輸入不同參數型別，可以有不同行為
 ```
@@ -113,7 +114,7 @@ tempelate <typename T>
 void swap(T &, T &);
 ```
 
-＃ 6.5 Features for Specialized Uses (specialization and instantiation)
+# 6.5 Features for Specialized Uses (specialization and instantiation)
 - 簡單來講，具體化是指，把原本的模板指定一個特定的型別，然後有特別的定義，函數運行方式，在定義和宣告的時候做具體化
 - 而實例化，指的是對於函數模板，把參數型別寫清楚，再呼叫函數的時候做實例化
 ```

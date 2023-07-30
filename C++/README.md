@@ -1,4 +1,4 @@
-# ref: C++ Primer fifth edition by Stanley B. Lippman
+# Ref: C++ Primer fifth edition by Stanley B. Lippman
 
 # chap 6 Functions
 - 6.2 Argument Passing
