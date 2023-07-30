@@ -72,6 +72,8 @@ double test(int n);
 long test(int n);
 double test(int n);
 ```
+
+# 6.5 Features for Specialized Uses (specialization and instantiation)
 - 對於某些函數，只是要替換參數型態，可以使用模板代替，
 ```
 聲明的時候寫一次
@@ -91,8 +93,6 @@ void swap(T &a, T &b) {
 template <typename T>
 ```
 - 如果要重載函數時，template 要再重寫一遍!
-
-- 書中給出以下例子來介紹顯示具體化的用法，
 - 因為模板也可以用在 structure, 如果直接調用 swap(T a, T b) 的話，會把所有 sturcture 裡的物件都交換，那如果我只想要 swap 其中一個呢?
 - 那顯然就不能使用 template 的 swap，在編譯器選擇調用哪個 swap 的時候，非模板版本會優先於顯示具體化和模板版本，而顯示優先於模板
 ```
@@ -114,7 +114,6 @@ tempelate <typename T>
 void swap(T &, T &);
 ```
 
-# 6.5 Features for Specialized Uses (specialization and instantiation)
 - 簡單來講，具體化是指，把原本的模板指定一個特定的型別，然後有特別的定義，函數運行方式，在定義和宣告的時候做具體化
 - 而實例化，指的是對於函數模板，把參數型別寫清楚，再呼叫函數的時候做實例化
 ```
