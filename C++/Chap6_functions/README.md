@@ -73,7 +73,19 @@ long test(int n);
 double test(int n);
 ```
 
-# 6.5 Features for Specialized Uses (specialization and instantiation)
+# 6.5 Features for Specialized Uses
+- 可以為函數設定參數初始值
+```
+typedef string::size_type sz;
+string  screen(sz ht = 24, sz wid = 80, cahr backgrnd = '');
+
+如果使用以下呼叫
+string window;
+window = screen(); // screen(24, 80, '');
+window = screen(66); //screen(66, 80, '');
+window = screen(, , '?') // error: 要空一定要從最右邊的參數開始空，向上面都是從右開始空
+```
+
 - 對於某些函數，只是要替換參數型態，可以使用模板代替，
 ```
 聲明的時候寫一次
@@ -136,8 +148,45 @@ int main (void) {
 
 ```
 
+# 6.7 function pointer
+- 基本的函數指標如下
+```
+bool lengthCompare(const string &, const string &);
+可以宣告一個 pf 指向回傳值是 bool 並且參數是兩個 const string 引用
+bool (*pt) (const string &, const string &);
+```
+- 函數名稱等於函數地址，所以以下兩者等價
+```
+pt = lengthCompare;
+pt = &lengthCompare; 
+```
+- 另外使用 pt 可以調用函數，以下三者等價
+```
+bool a1 = pt("a", "b");
+bool a2 = (*pt)("a", "b");
+bool a3 = lengthCompare("a", "b");
+```
+- 並不能返回一個函數，但是可以返回指向函數的指標
+```
+using F = int(int*, int); 這是一個 function 的型別
+using PF = int(*)(int*, int); 這是一個 function pointer 型別，指向的函數要是回傳 int 並且有兩個參數
+```
+上面就是定義兩種類型，可以用來減化聲明
+```
+PF fi(int); // 合法，f1 可以返回一個函數指標 
+F f1(int); // 非法，f1 不能返回函數
+F* f1(int); // 合法，返回一個函數指標
+```
+如果不使用 using 簡化，也可以寫成以下
+```
+int (*f1(int))(int*, int);
+```
+- 由內向外順序，f1 有參數列表示一個函數，前面 * 表示回的一是一個指標，
+- 是什麼的指標，是一個回傳 int，並接受 int* 和 int 兩參數的函數的指標
 
-    
+
+
+
 
 
  
