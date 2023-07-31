@@ -5,5 +5,7 @@
 - 6.4 Overloaded Functions
 - 6.5 Features for Specialized Uses
 - 6.7 Pointers to Functions
+
 # chap 7 Classes 
-- 
+- 7.1 Defining Abstract Data Types
+- 7.2 Access Control and Encapsulation
