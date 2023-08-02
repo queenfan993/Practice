@@ -1,0 +1,19 @@
+硬體 io
+bus 上面 address port 和 io port 其實是一樣的
+所以我要怎麼知道現在是要透過這個 port 做 memory access 還是要讀某個裝置的 io
+1. mapping to an address
+   透過 ic 內部電路，可以寫韌體控制，當送出的 port number 是多少的時候，enable 和 disable 特定 ic
+   缺點是會讓某些 memory 讀取不到
+2. mapping to io port
+   意思就是多一根 pin，去讓該 bus 上面的人知道，我現在是要 memory access 還是 io
+********************************
+driver
+能跟硬體 io 溝通的程式
+1.在什麼 port 
+2.有甚麼 command
+3.用什麼 protocol
+知道這些基本上就是會寫 driver
+
+********************************
+pic (programable interupt controller)
+ 

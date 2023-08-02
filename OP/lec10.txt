@@ -1,0 +1,34 @@
+Exception
+產生都來自執行了某道程式
+所以會說 sychronous，因為 clock 就是跟 cpu 同步的
+直接丟到 vector calculation 查表，再跑到 isr
+
+interrupts
+asychronous 相對於 exception 而言，先交由 PIC 判斷 priority 高低再丟訊號到 vector calculation 查表，最後跑到 isr
+*******************************
+流程像是
+有 interrupt 或者 excep，查表(intrrupt vector table)得出 isr，
+停止原先工作，跳轉 instruction pointer 到 isr 位置，再 restore 原來位置
+
+*******************************
+存取原先工作的方法是 hardware dependent，根據不同的架構會有不同方法，
+但基本上都是存在記憶體當中，system stack 裡面，平常不常被使用的一段空間，放在 kernel 裡面。
+
+如果在 interrupt 裡面在 interrupt，也是一樣會存下原來的 interrupt，再執行 
+
+*******************************
+interrupt latency 表示 interrupt 產生到 isr 將要被執行的時間，不可控，所以是判斷 os 好壞的根據
+processing time 表示 isr 執行時間，程式設計者可控，但可能被打斷 
+
+interrupt response time = 上面兩個相加
+*******************************
+什麼時候 interrupt latency 可能難以預測
+1. 可能本來就在做上一個來自同一個 int 來源的指令，會關掉同一個 int 接收
+2. 當有高位的 interrupt 進來，可能關掉 pic 較低位的，導致低位的 int 進不來
+3. os 再 handle 非常 critical 的 job，可能會關掉 io
+
+所以造成 interrupt response time 的不確定
+統計學上來說 只要能在打進來後 32 個 machine cycle 裡面處理完，那就是一個好的 os
+*******************************
+我的出現影響到別人的執行，所以 isr 是越短越好
+*******************************

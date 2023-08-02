@@ -1,0 +1,19 @@
+
+kernal sapce 和 user space
+簡單來講就是在 virtual 空間，要留空間給 kernal os 使用，linux 通常是 1:3，可以使用 3/4 來寫應用程式。
+1/4是怎樣都儲存不到的。
+
+logic 上面有用到，不代表 physical 上面會用到，例如可能給了一個 buffer長度，但根本沒用到，
+就不會 load 到 physical 上面，所以終其一生，這個變數只存在在 logic 上面。
+*************************************
+kernel
+
+stack向下長
+
+memory mapping -shared 
+
+heap向上長
+
+bss  -放一些例如 buffer，你需要一個空間，但沒有給初始值，未初始化的全局變量
+data -static 或者 global const 等等的 
+text -程式

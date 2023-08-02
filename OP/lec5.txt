@@ -1,0 +1,73 @@
+分成應用程式和 kernal 記憶體管理，各自該注意的不同
+**************************
+先講了一段程式執行的流程，程式執行時會用到兩段記憶體，一段是 code，一段是 stack，
+cpu 的 instruction pointer 上面會指到的位置，透過 memory bus 去看記憶體中 code 那段的資料，一行一行去執行，
+然後透過 base pointer 指到 stack，在用 offset 去取值
+以上例子都是透過 physical 直接存取，
+引出記憶體保護的問題還有效率的問題。
+**************************
+physical 和 virtual 
+虛擬記憶體的好處
+1.透過虛擬記憶體讓實體記憶變成可以共享
+2.可以獨立開不同的 process，透過給假的記憶體位置(虛擬)
+3.可以給定概念上的連續的大片段記憶體
+4.提升效率 ex: 如果 process 有一堆 function， 
+  不一定要剛開始就全部load到實體，可以在有需要的時候在load，當然缺點就是會減慢一點速度
+
+缺點是轉換的硬體(MMU)需要錢，記憶 table 的記憶體也需要錢，
+還有記憶體位置轉換的 overhead。
+
+虛擬記憶體是使用者跟 COMPILER 認知的，不是實際的位置，需要透過 MMU 轉換，DATA 需要轉，instuction 也需要轉。
+這些 instruction 會透過 base pointer 指到實體記憶體位置，透過 offset 的方式找到需要到位置
+
+**************************
+使用者的虛擬記憶體，總是會認為自己有連續的大空間記憶體 (如果 32-bit 定址，就是有 4G)
+怎麼對應虛擬記憶體和實體記憶體，SEGMENT 或者 PAGING 技巧。
+
+
+**************************
+Segmentation
+把記憶體切成一段一段，希望使用者的段落彼此隔離，CODE 和 STACK 也彼此隔離，解決保護的問題，
+virtual memory address 分成兩個 part，
+前面那段是指向 MMU 裡面 TABLE 的一個offset (從 MMU 的頭開始算，最後算到 TABLE 的一個特定位置)，
+每個 TABLE 上面的位置都有兩個重要的指標就是 limit 和 base。
+limit 表示該段可以使用的上限空間，BASE 就是實體記憶體的起始位置
+後面那段也是一個 offset，從第一段查 MMU 裡的 table 得到的 base，在實體memory上算出最後真正的實體位置。
+
+可以把表放到 cpu 裡面或者直接在記憶體裡面
+
+**************************
+Paging
+概念上和 segment 很像，就是多一層階級，cpu 可以透過 page table number 經由 MMU 向記憶體裡面的 page table 要到
+記憶體上另一段的 base address 並且和 offset 做運算就可以找到正確位置存取 
+
+快取 TLB 放在 CPU 裡面，可以直接透過 p (page number) 和 d (offset) 找到正確位置，
+不用再找到透過 page table 去透過 p 對應出 f (記憶體上的 base add)。
+
+***************************
+page fault 是一種 exception ，在對應表中找不到對應的實體記憶體，這個時候可以
+1. cpu 等待，等我對應完重新讀。
+2. 如果沒有實體空間，把最不重要的 process 洗到硬碟去。
+
+***************************
+context switch 一定要 flush TLB，或者可以加入 PID，就可以避免部分 FLUSH
+
+***************************
+TLB cache 的兩種做法 
+logic caches
+1.可以做在 MMU 前面紀錄 logic add 或者做在 MMU 後面紀錄 physical add
+physical cashes
+2.如果是做在對應 physical 之後就是會慢一些，但好處是不用在 context switch 的時候不用 flush，看設計的用途。
+
+***************************
+有一個重要概念是，logic address，以 32-bit 為例可以定址 4G 位置，
+但是其實要默認一段空間給 kernel，目前常用做法是 1:3，所以就算你可以 logic 但實體位置你是用不到 4G 的
+
+
+
+
+
+
+
+
+

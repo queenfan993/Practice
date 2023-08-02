@@ -1,0 +1,56 @@
+**********************************
+physical fragmentation
+external:
+資料占用 pysical memory 時，不同程式間隔的空間浪費現象，
+使用 frame size 切 physical，並用一個表紀錄在 OS 程式段，
+
+internal:
+因為處理 external 的時候會使用 frame size 切 physical，此時若剛好有程式略大於 frame size 的大小，
+會切兩個frame 給該程式，就造成第二個 frame 的空間浪費。
+可以使用不同 frame 大小來給程式
+
+***********************************
+swapping space
+當 physical space 不夠的時候，會把記憶體的東西清到硬碟去
+有的時候會直接設一個滿水線，還沒真的用完，就先清一些東西過去，以免之後要用會 lag
+
+
+***********************************
+kernel 怎麼設計 memory meanagement
+1. 管理記憶體本身花費記憶體-不能用太複雜的資料結構處理，overhead 要平衡
+2. 希望 logic 連續並且 physical 連續 for better performance
+
+prefer logic 連續
+
+linux 有兩種資料結構來做 memory menagement
+1. buddy 
+2. slab
+***********************************
+buddy allocator 給予大範圍連續 page 的演算法
+維持一個表，以 2 的次方 * 4k 的方式，用 linked list 指向位置，告訴我有哪些實體空間有這樣的位置。
+例如剛開始開機時，一個表，會在下方填上一串 linked list，因為此時會有比較大的連續空間，往下表示2的次方越大，
+最上面是 2 的0次方。
+當有人向 cpu 索取空間時，就往下拆。
+例如現在有 2 * 4k = 8k 連續空間在表內，此時有人要求一個 5 k 那就會把這個 8 k 直接給他。
+如果是要 3k 那就會把 8k 拆開，並把一個 4k 給使用的 process，另外 4k 存回表內
+
+會出現一些浪費，因為是以 2次方來配置
+造成嚴重的 internel fragmentation
+***********************************
+slab allocator 拿來降低 internal fragmentation (其實就是 page 裡面的小空間，切成共同大小的資料結構，object)
+目的:
+1. 因為 buddy 產生的 internal 問題，希望用一個其他資料結構，把兩三個空間配到同一個 page裡面
+2. 因為 fork 就要，kill 就還，但發現常常會用到的就那些程式，不用每次都還空間回去，
+   不要讓 kernel program 直接面對 page allocator，直接就擺一個 cache (應該只是一個概念上)，把常用的直接 keep 下來
+3. 希望 object(某種資料結構有共同大小占用 memory) 之間隔一點距離
+************************************
+
+所以大的空間就用 buddy 要，小空間就是用 slab 要 
+api 可以在整理一下，反正就是根據這兩個方法，linux 有提供 api 給 kernel 的撰寫者使用。
+
+
+
+
+
+
+

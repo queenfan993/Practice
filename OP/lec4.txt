@@ -1,0 +1,35 @@
+interupt stack 
+中斷的資料是被保存在其他自己的額外空間底下，例如封包的中斷，我要解到後來看到 port 才知道是哪個 process 的資料
+但在解讀到 port 之前，其實不知道該歸類在哪裡，資料應該存在哪裡，所以才有 interupt 自己的存儲空間
+
+
+context switch - 透過 kernel 層的 schedule 轉換前，存儲原本的資料再進行轉換另一個 process
+
+***************************************************
+User preemption - 透過 schedule 從 process 1 轉到其他 process
+所以我們在意甚麼時候有call 到 kernel 層的 schedule，
+例如當 user process 1執行 system call 做完或者執行途中被 interupt 後，kernel執行完任務，
+經過 scheduler 要跳回 user space，結果跳到另一個 process 上 
+
+Kernel preemption - 
+在 kernel space 的情況下，(已經是在做 system call 或者 interupt 的情況下)
+被切到另一個 process 下
+**************************************************
+當多核心的時候
+有可能瞬間兩人跑同一行程式
+但是不會同時 access memory ， memory bus 只有一個，但可能同時跑是因為有 cache
+**************************************************
+context switch - 要 CPU 的暫存器資料 SWITCH 成新的 PROCESS 的資料
+把目前 process 1 占用 CPU 的 register 狀態存到 RAM 裡面，用 Task state segment 的方式存(x86)，
+再從 RAM 把 process 2 的資料讀回暫存器。
+x86 的架構下會使用 GDT 去指到每個 process 的 TSS，以獲取 process 需要回填到暫存器的資料
+
+**************************************************
+Thread 的概念，其實就是要省空間，例如開了五個 word，我有需要完整的備份五個 word 空間嗎?
+其實是不用的，為了節省空間，只要把 stack 分開就可以，所以在剛剛討論的 context switch 部分，
+可以發現有些 GDT 當中指到的 TSS 是一樣的，所以切換 thread 會更快，比切換 process 更快，因為有共用的部分。
+在 RAM 上面的分布，其實就是 PROCESS 的地方放 CODE SEGMENT 和 DATA SEGMENT 各自的 THREAD 空間放 STACK 的資料。
+所以總共有哪些地方共用，PROCESS 的地方還有可能 TSS 也是一樣的。
+
+對 KERNEL 來說是用 THREAD 去看分時，例如開了五個 WORD 和三個 EXCEL，概念上就是切成八塊 
+有各自的 thread id, program counter, register set 和 stack
