@@ -8,4 +8,7 @@
 
 # chap 7 Classes 
 - 7.1 Defining Abstract Data Types
-- 7.2 Access Control and Encapsulation
+- 7.2 Access Control and Encapsulation+
+- 7.3 Additional Class Features
+- 7.5 Constructors Revisited
+- 7.6 static Class Members

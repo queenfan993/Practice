@@ -68,12 +68,156 @@ class Sales_data {
 };
 
 ```
+- 友元的聲明只能出現在類的內部，在類內的位置不限，因為不是成員函數，所以不受訪問說明符控制
+- 因為友元在類內的聲明只表示，他是類的友元，如果希望類的用戶可以調用某個友元，那應該要在類的外部再聲明一次
+- 以 block 4 為例，Sales_data 的頭文件，應該為 read、 print、 add 提供獨立的聲明 (類的外部)，這樣類的用戶才可以使用
 
+# 7.3 Additional Class Features
+- 以 Screen 為例，實作 inline 可在聲明，也可在外部使用 inline 關鍵詞，並觀察 this 指標
+```
+block5:
 
+class Screen {
+    public:
+        typedef std::string::size_type pos;
+        Screen() = default;                     // needed because Screen has another constructor
 
+        Screen(pos ht, pos wd, char c): height(ht), width(wd),
+                                                contents(ht * wd, c) { }
+        char get() const                        // get the character at the cursor
+                { return contents[cursor]; }    // implicitly inline
+        inline char get(pos ht, pos wd) const;  // explicitly inline
+        Screen &move(pos r, pos c);             // can be made inline later
+    private:
+        pos cursor = 0;
+        pos height = 0, width = 0;
+        std::string contents;
+};
+```
+- 函數聲明在類的內部或者說在標頭檔，實作則在對應的 cpp 當中
+```
+block6:
 
+inline // we can specify inline on the definition
+Screen &Screen::move(pos r, pos c)
+{
+    pos row = r * width; // compute the row location
+    cursor = row + c; // move cursor to the column within that row
+    return *this; // return this object as an lvalue
+}
+char Screen::get(pos r, pos c) const // declared as inline in the class
+{
+    pos row = r * width; // compute row location
+    return contents[row + c]; // return character at the given column
+}
+```
+- 另外其實比較推薦 inline 在函數定義時寫就好，聲明可以忽略，但兩個地方都寫上也是合法的
+- 實作時函數名稱前面都需要標明來自哪個類 (Screen::)，this 指標代表在物件內修改 cursor
+- 另外補充以下兩點，
+```
+block7:
 
+1. 使用 Screen & 作為返回，可以讓物件調用函數之後，直接當成左值，並且支援鍊式調用
+Screen myScreen(5, 10, '#');
+myScreen.move(2, 3).move(1, 8).move(3, 5);
+以上如果想要鍊式調用一個有定義 const 成員函數返回 *this 的話會失敗，例如建立一個 display 秀出 Screen 內容
+Screen myScreen;
+myScreen.display(cout).move(2, 3);
+這樣是會錯的
 
+2. get 的 const 表示不修改類裡面的參數
+但其實可以設定參數為 mutable 關鍵詞，表示永遠不能是 const
+就算成員函數後面有 const 詞，還是可以修改該參數
+```
+# 7.3.4 友元再探
+- 除了上述提到的可以定義非成員函數之外，其實其他類也可以被定義為 friend
+- 如果今天有一個 Window_mgr 類，裡面有一個需要清除 Screen 的內容的函數 clear，表示 clear 需要訪問 Screen 的私有成員
+```
+block8:
+
+// for the whole class Window_mgr
+class Screen {
+    // Window_mgr members can access the private parts of class Screen
+    friend class Window_mgr;
+    // . . . rest of the Screen class
+};
+
+class Window_mgr {
+    public:
+        // location ID for each screen on the window
+        using ScreenIndex = std::vector<Screen>::size_type;
+        // reset the Screen at the given position to all blanks
+        void clear(ScreenIndex);
+    private:
+        std::vector<Screen> screens{Screen(24, 80, ’ ’)};
+        };
+        void Window_mgr::clear(ScreenIndex i)
+        {
+        // s is a reference to the Screen we want to clear
+        Screen &s = screens[i];
+        // reset the contents of that Screen to all blanks
+        s.contents = string(s.height * s.width, ’ ’);
+}
+```
+- 如果只讓 clean funtion成為友元，那 Window_mgr 必須事先聲明
+- 順序要是，先在 Window_mgr 裡面聲明 clear 但不能定義，之後 Screen 聲明 clear 為其友元，最後定義 clear
+```
+block9:
+
+class Screen {
+    // Window_mgr::clear must have been declared before class Screen
+    friend void Window_mgr::clear(ScreenIndex);
+    // . . . rest of the Screen class
+};
+```
+- 另外如果函數名稱有不同重載版本，友元的聲明要寫清楚是哪一個重載的函數是友元
+- 上面有提到類的函數是另一個類的友元，那如果是非類的外部函數要聲明為友元呢，順序應該如下，其實是可以先 friend 聲明的
+```
+block10:
+
+struct X {
+    friend void f() { /* friend function can be defined in the class body */ }
+    X() { f(); } // error: no declaration for f
+    void g();
+    void h();
+};
+void X::g() { return f(); } // error: f hasn’t been declared
+void f(); // declares the function defined inside X
+void X::h() { return f(); } // ok: declaration for f is now in scope
+```
+
+# 7.5 Constructors Revisited
+- 如果成員函數是 const 或者引用的話則必須給定初始值
+```
+block11:
+
+class ConstRef {
+    public:
+        ConstRef::ConstRef(int ii): i(ii), ci(ii), ri(i) { }
+    private:
+        int i;
+        const int ci;
+        int &ri;
+};
+```
+- 委託構造函數 (delegating constructor)
+- 某個類的構造函數，使用該類中其他的構造函數幫忙初始化
+```
+class Sales_data {
+    public:
+        // nondelegating constructor initializes members from corresponding arguments
+        Sales_data(std::string s, unsigned cnt, double price):
+        bookNo(s), units_sold(cnt), revenue(cnt*price) { }
+        // remaining constructors all delegate to another constructor
+        Sales_data(): Sales_data("", 0, 0) {}
+        Sales_data(std::string s): Sales_data(s, 0,0) {}
+        Sales_data(std::istream &is): Sales_data()
+        { read(is, *this); }
+        // other members as before
+};
+```
+
+# 7.6 static Class Members
 
 
 
