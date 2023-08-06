@@ -187,7 +187,8 @@ void X::h() { return f(); } // ok: declaration for f is now in scope
 ```
 
 # 7.5 Constructors Revisited
-- 如果成員函數是 const 或者引用的話則必須給定初始值
+＃7.5.1 構造函數初始直和 7.5.3 默認構造函數的作用
+- 如果成員是 const 或者引用的話則必須給定初始值，意思就是不可以使用默認的建構子，必須把初始化的建構子寫好
 ```
 block11:
 
@@ -200,9 +201,28 @@ class ConstRef {
         int &ri;
 };
 ```
+- 另外如果建構子對每個成員都提供默認實參，例如 int 給 0、 string 給 ""，那其實跟定義了一個默認建構子是一樣的
+- block12 以一個 class A 為例，說明上述論點
+- 如果一個 class 有非默認建構子的建構子，但是沒有定義默認建構子的話，是不可以使用block12的 A a; 的這個敘述來生成物件 
+```
+block12:
+
+//如果有一個建構子
+A(int a = 0, std::string s = "") : ans(a), book(s) {}
+
+//那我可以同時使用以下初始化物件
+A a;         // 正確，使用建構子 A(int a = 0, std::string s = "")
+A b(42);     // 正確，使用建構子 A(int a = 0, std::string s = "")， s被初始化為空字串
+A c(42, "Hello");  // 正確，使用建構子 A(int a = 0, std::string s = "")
+
+```
+
+＃ 7.5.2 委託構造函數
 - 委託構造函數 (delegating constructor)
 - 某個類的構造函數，使用該類中其他的構造函數幫忙初始化
 ```
+block13
+
 class Sales_data {
     public:
         // nondelegating constructor initializes members from corresponding arguments
@@ -216,8 +236,162 @@ class Sales_data {
         // other members as before
 };
 ```
+＃ 7.5.4 隱式的類類型轉換
+- 隱式轉換只允許一步，如 block14 說明
+```
+block14
+
+string null_book = "9-999-99999-9";
+// constructs a temporary Sales_data object
+// with units_sold and revenue equal to 0 and bookNo equal to null_book 
+item.combine(null_book); //correct -(1) 
+
+// error: requires two user-defined conversions:
+// (1) convert "9-999-99999-9" to string
+// (2) convert that (temporary) string to Sales_data
+item.combine("9-999-99999-9");
+
+// ok: explicit conversion to string, implicit conversion to Sales_data
+item.combine(string("9-999-99999-9")); // -(2)
+// ok: implicit conversion to string, explicit conversion to Sales_data
+item.combine(Sales_data("9-999-99999-9"));
+item.combine(cin); // -(3)
+```
+- 可以透過 explicit 關鍵字 block15，來禁止隱式轉換，則 block14 的 (1)、(2)、(3) 號式子都會錯
+- 注意 explict 只允許出現在類內的建構子聲明，其他函數並不適用
+```
+block15
+
+class Sales_data {
+public:
+    Sales_data() = default;
+    Sales_data(const std::string &s, unsigned n, double p):
+    bookNo(s), units_sold(n), revenue(p*n) { }
+    explicit Sales_data(const std::string &s): bookNo(s) { }
+    explicit Sales_data(std::istream&);
+    // remaining members as before
+};
+```
+
+＃ 7.5.5 聚合類 (aggregate class)  
+- 一個類是聚合類要包含四點
+* 1. 所有成員是 public
+* 2. 沒有定義任何構造函數
+* 3. 沒有類內的初始直
+* 4. 沒有基類，沒有 virtual 函數
+- 例如一個 struct Data 有一個 int 和一個 string 參數，聚合類可以用 Data value = {0, "LEO"} 例如這樣的形式來初始化
+
+＃ 7.5.6 字面值常量類 (Literal Classes)
+- 常量表達式，用 constexpr 來標記，告訴編譯器該表達式可以在編譯時期求值
+- 字面值，直接寫在程式中的常數值，例如整數、浮點數、字源、字串等類型的常數值，可以被加上 constexpr 關鍵字
+- 一個類是字面常量類，要有以下四點
+* 1. 數據成員都是字面值類型 (所以可以被加上 constexpr)
+* 2. 類包含至少一個含有 constexpr 關鍵字的建構子
+* 3. 如果數據成員含有類內的初始值，則該成員的初始值，必須是一條常量表達式，又如果該成員屬於某類類型，則必須使用其類的 constexpr 建構子
+* 4. 類必須使用解構子的默認定義
+- 建構子不能是 const，但可以是 constexpr
+- constexpr 可以聲明成 = default，並且如果要符合 constexpr 則表示該構造函數不能有返回語句，由此可知，constexpr 建構子是空
+- constexpr 建構子必須初始化所有數據成員，必須使用初始值，constexpr 構造函數或者一條常量表達式來初始化
+- 
+```
+block16
+
+class Debug {
+    public:
+        constexpr Debug(bool b = true): hw(b), io(b), other(b) { }
+        constexpr Debug(bool h, bool i, bool o):
+        hw(h), io(i), other(o) { }
+        constexpr bool any() { return hw || io || other; }
+        void set_io(bool b) { io = b; }
+        void set_hw(bool b) { hw = b; }
+        void set_other(bool b) { hw = b; }
+    private:
+        bool hw; // hardware errors other than IO errors
+        bool io; // IO errors
+        bool other; // other errors
+};
+
+//當生成物件時，一樣使用多載的那個
+constexpr Debug io_sub(false, true, false); // debugging IO
+if (io_sub.any()) // equivalent to if(true)
+    cerr << "print appropriate error messages" << endl;
+constexpr Debug prod(false); // no debugging during production
+if (prod.any()) // equivalent to if(false)
+    cerr << "print an error message" << endl;
+
+```
 
 # 7.6 static Class Members
+- 類內的 static 數據成員，對於所有類的對象來說，static 的成員就是只有共同的一份
+- 類內的 static 函數，不可以使用 this，因為該函數並不予任何對象綁定
+```
+block17
+
+class Account {
+    public:
+        void calculate() { amount += amount * interestRate; }
+        static double rate() { return interestRate; }
+        static void rate(double);
+    private:
+        std::string owner;
+        double amount;
+        static double interestRate;
+        static double initRate();
+};
+
+// 在外部定義，並且只定義一次，沒有 static 關鍵字
+double Account::interestRate = initRate();
+
+// 使用作用域運算符調用類的 static 函數
+ double r;
+ r =  Account::rate();
+
+
+// equivalent ways to call the static member rate function
+Account ac1;
+Account *ac2 = &ac1;
+r = ac1.rate(); // through an Account object or reference
+r = ac2->rate(); // through a pointer to an Account object
+
+//在外部定義時不能寫 static，static 只能出現在類內
+void Account::rate(double newRate)
+{
+    interestRate = newRate;
+}
+
+```
+- 以 block17，每個對象都會有兩個數據成員，owner 和 amount，只存在一個 interestRate 並被所有 Account 對象共享
+- 類的 static 數據成員的初始化通常透過外部定義，並且只被定義一次，當然也可以直接在內部定義 (書中給的例子是 constexpr 編譯器時期決定時)
+- 類的 static 函數，則可以選擇在內部或外部定義，但注意在外部定義時不可以有 static 關鍵字
+- 以下列出一些類的靜態變數合法但普通變數可能不合法的場景
+```
+block18
+
+// 靜態數據可以是不完全類型 (補充如下)，靜態數據成員的類型可以是它自己的所屬類類型，但非靜態成員不行
+class Bar {
+    public:
+        // . . .
+    private:
+        static Bar mem1; // ok: 靜態資料成員可以使用非完全
+        Bar *mem2; // ok: 指標可以使用非完全是因為不用再編譯時就知道類的大小
+        Bar mem3; // error: 錯誤是因為，大小需要在定義時就確定
+};
+
+// 靜態數據成員可以作為默認實參，非靜態數據成員不行是因為它本身屬於對象的一部分
+class Screen {
+    public:
+        // bkground refers to the static member
+        // declared later in the class definition
+        Screen& clear(char = bkground);
+    private:
+        static const char bkground;
+};
+
+```
+- 補充一下完全和不完全類型
+- 不完全類型（Incomplete Type）是指在某一個程式碼位置，該類型的定義不完整
+- 無法完全確定該類型的大小或成員資訊，這種情況通常會導致編譯器無法進行某些操作，直到該類型的完整定義可用為止
+- 反之就是完全類型
 
 
 
