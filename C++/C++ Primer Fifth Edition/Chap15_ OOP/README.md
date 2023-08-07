@@ -36,6 +36,7 @@ double print_total(ostream &os,
 2. 又因為 net_price 是引用的物件調用，所以會自動調用各自的版本，因為是在運行時選擇版本，所以稱為動態綁定
 
 # 15.2 Defining Base and Derived Classes
+- 
 
 
 
