@@ -1,5 +1,5 @@
 # Bluetooth Core System Architechture
-ref : ![Bluetooth Core Specification v5.4](./ref/Core_v5.4.pdf)
+ref : [Bluetooth Core Specification v5.4](./ref/Core_v5.4.pdf)
 
 - BR/EDR : L2CAP, SDP and GAP blocks
 - LE : L2CAP, SMP, Attribute Protocol, GAP and Generic Attribute Profile (GATT) blocks
