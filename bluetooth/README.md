@@ -1,5 +1,5 @@
 # Bluetooth Core System Architechture
-ref : Bluetooth Core Specification v5.4 chapter 2
+ref : ![Bluetooth Core Specification v5.4](./ref/Core_v5.4.pdf)
 
 - BR/EDR : L2CAP, SDP and GAP blocks
 - LE : L2CAP, SMP, Attribute Protocol, GAP and Generic Attribute Profile (GATT) blocks
@@ -7,7 +7,7 @@ ref : Bluetooth Core Specification v5.4 chapter 2
 - 藍牙控制器的 buffer 有限，在 L2CAP 提供排程，將 SDU (service) 切割成 PDU (protocol) 形成起始或是連續封包來配合 buffer 大小
 - ARQ 和一些選定的功能，例如錯誤檢測和重傳或者 window-based flow control 都可以在傳統藍牙使用，LE 則不見得
 
-![bt architecture](./img/arch.png)
+![bt architecture](./ref/arch.png)
 # Host Architectural Blocks
 1. Channel Manager
 - 用來創建，管理，和刪除 L2CAP 通道，和其他對等設備的 channel manager 溝通也可以向下和本地的 link manager 配置新的鏈接達成 QoS
@@ -22,7 +22,7 @@ ref : Bluetooth Core Specification v5.4 chapter 2
 - peer-to-peer protocol used to generate encryption keys and identity keys
 - 在一個專用的 L2CAP 通道上使用
 
-4. Attribute Protocol (ATT) 
+4. Attribute Protocol (ATT)  
 ref : https://hackmd.io/@AlienHackMd/rJHiN5S7o
 - 一樣是 peer-to-peer，LE，並且使用 L2CAP 專用通道
 - 定義讀寫特徵的格式，分四個 block (handle，type，value，permission)
@@ -106,7 +106,7 @@ ref: https://blog.51cto.com/u_15314083/3190495
         case HCI_SCODATA_PKT: //
 ```
 ## hci_tx_work
-ref: https://blog.csdn.net/android_lover2014/article/details/88421594
+ref: https://blog.csdn.net/android_lover2014/article/details/88421594  
 ref: https://ithelp.ithome.com.tw/articles/10252873
 ```
 1. 
