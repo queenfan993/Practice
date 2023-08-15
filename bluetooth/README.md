@@ -1,7 +1,44 @@
-linux-5.19.0
+# Bluetooth Core System Architechture (5.4)
+- BR/EDR : L2CAP, SDP and GAP blocks
+- LE : L2CAP, SMP, Attribute Protocol, GAP and Generic Attribute Profile (GATT) blocks
+- 透過 HCI (Host Controller Interface) 溝通 host 和藍牙 controller ，為兩者提供複數界面的接口 (uart，usb ...)
+- 假設藍牙控制器的 buffer 有限，在 L2CAP 就要提供排程，將 SDU (service) 切割成 PDU (protocol) 形成起始或是連續封包來配合 buffer 大小
+- ARQ 和一些選性的功能，例如錯誤檢測和重傳或者 window-based flow control 都可以在傳統藍牙使用，LE 則不見得
 
 ![bt architecture](./img/arch.png)
+# Host architectural blocks
+1. Channel manager
+- 用來創建，管理，和刪除 L2CAP 通道，和其他對等設備的 channel manager 溝通也可以向下和本地的 link manager 配置新的鏈接達成 QoS
+- 可以理解為 link 是物理上的鏈接，實際的藍牙連線，所以一條 link 可以多個 channel 來傳輸不同的數據類型
 
+2. L2CAP resource manager
+- 管理 PDU 和 SDU 來配合 buffer 或者可用的 slot 大小，或者符合 QoS
+- PDU 是最小傳輸單位，SDU 是包含更多協定控制數據和應用數據，可以被分成多個 PDU 片段
+
+3. Security Manager Protocol
+- 只用於 LE 設備，因為 SMP 區塊在 HOST 上，用來減少 LE 控制器的成本，BR/EDR 的類似功能實做於控制器 link manager 裡面，
+- peer-to-peer protocol used to generate encryption keys and identity keys
+- 在一個專用的 L2CAP 通道上使用
+
+4. Attribute Protocol (ATT)
+ref : https://hackmd.io/@AlienHackMd/rJHiN5S7o
+- 一樣是 peer-to-peer，LE，並且使用 L2CAP 專用通道
+- 定義 client 向 server 讀寫特徵的格式，分四個 block (handle，type，value，permission)
+
+5. Generic Attribute Profile (GATT)
+- 建立在 ATT 之上，定義 profile 框架，階層式的給數據更多描述
+- 引入客戶端和服務端概念，客戶端主動發起操作，服務端提供服務
+
+6. Generic Access Profile
+- 定義所有藍牙設備都可能有的功能，
+- 連接的流程，和應用的 profile，設備的發現，連接的模式等等...
+
+# BR/EDR/LE Controller architectural blocks
+1. Device manager
+-  
+
+
+linux-5.19.0
 # hci_core.h
 - 位置 include/net/bluetooth/hci_core.h
 
@@ -11,7 +48,7 @@ linux-5.19.0
 3. net/bluetoot/sco.c
 4. net/bluetoot/l2cap.c
 
-## 內容˙
+## 內容
 1. HCI interface to upper protocols     807
 - l2cap
 - sco
