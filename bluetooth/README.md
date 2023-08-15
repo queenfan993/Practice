@@ -1,6 +1,6 @@
 linux-5.19.0
 
-[bt architecture][./img/arch.png]
+[bt architecture][img/arch.png]
 
 # hci_core.h
 - 位置 include/net/bluetooth/hci_core.h
