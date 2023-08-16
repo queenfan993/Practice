@@ -1,36 +1,39 @@
 # hci_core.h
 - 位置 ./include/net/bluetooth/hci_core.h
-
-## 巨集常數
-1. 
-
-
-## 各類 struct 和 enum 和
-1. 
-
-
-
-
-## 函數實作位置 
-1. ./net/bluetoot/hci_core.c
-2. ./net/bluetoot/hci_conn.c
-
+- 定義在 host 上面的 hci 界面
 
 ## 函數類型
-### 1. HCI interface to upper protocols    (807)
-1. 函數定義在 ./net/bluetoot/l2cap_core.c
-- 包含 l2cap 的連線建立和中止，定義收到 acl 訊號時應該怎處裡
-2. 函數定義在 ./net/bluetoot/sco.c
-- 如果有傳統藍牙存在，定義連線和處理 sco 資料
-### 2. Inquiry cache                       (827)
-3. HCI Connections                      886
-4. HCI Devices                          1236
-5. LMP capabilities                     1428
-6. Extended LMP capabilities            1454
-7. Host capabilities                    1462
-8. HCI protocols                        1519
-9. HCI callbacks                        1547
-10. HCI Sockets                         1745
+### 1. HCI interface to upper protocols     (807)
+1. l2cap 的連線建立和中止，定義收到 acl 訊號時應該怎處裡
+- 函數實作 ./net/bluetoot/l2cap_core.c
+
+2. 相對於 acl，如果有傳統藍牙存在，定義連線和處理 sco 資料
+- 函數實作 ./net/bluetoot/sco.c
+
+### 2. Inquiry cache                        (827)
+1. 設定 hci 設備的 inquiry state，可以是開始 discover，正在尋找，結束等等
+2. 將掃到的結果可以存在快取裡，查詢周圍設備存在快取時間，操作 clean 或 update 等等
+- 函數實作 ./net/bluetoot/hci_core.c
+
+### 3. HCI Connections                      (886)
+1. 對於邏輯鏈路 conn 的管理(ACL, AMP, LE, SCO)，針對 hash 進行新增刪除和查詢各種類連線數量
+2. 建立或刪除藍牙通道 chan 數據類型，其中包括 chan list 和 queue 等資料
+- 一個 conn 可以有多個 chan，可以理解為一個邏輯 link 上，有不同資料類型的傳輸，可能有控制訊號，音訊等
+- 所以 chan list 就好像是某種目的的 list，例如有兩個音訊資料 chan 都在同一個 conn 上面
+- 用到的 struct 部份就在 hci_core.h 裡
+- 其他函數實作 ./net/bluetoot/hci_conn.c
+
+### 4. HCI Devices                          (1236)
+1. 
+
+
+
+### 5. LMP capabilities                     1428
+### 6. Extended LMP capabilities            1454
+### 7. Host capabilities                    1462
+### 8. HCI protocols                        1519
+### 9. HCI callbacks                        1547
+### 10. HCI Sockets                         1745
 
 
 # hci_core.c

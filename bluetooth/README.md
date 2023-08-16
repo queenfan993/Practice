@@ -65,7 +65,22 @@ ref : https://hackmd.io/@AlienHackMd/rJHiN5S7o
 - 利用 fragmentation/recombination or segmentation/reassembly 的方式來讓上下溝通更有彈性
 
 # Based on linux-5.19.0 kernel source code
-- 有了大致的架構概念，再來從 kenel 藍牙部份的 Makefile 觀察，上面的架構有哪些被包含
+- linux kernel code 跟藍牙相關的部份
+```
+linux ---- include
+      |       |
+      |       ---- net
+      |             |
+      |             ---- bluetooth : 標頭 
+      ---- net
+      |     |
+      |     ---- bluetooth : 實做和部份標頭 
+      |
+      ---- drivers
+              |
+              ---- bluetooth : modules
+```
+- 有了大致的架構概念，首先從核心藍牙系統的 Makefile 觀察實際實作有哪些大的 block 
 - net/bluetooth/Makefile
 ```
 # SPDX-License-Identifier: GPL-2.0
@@ -100,6 +115,9 @@ bluetooth-$(CONFIG_BT_SELFTEST) += selftest.o
 - [hci_core.h](https://github.com/queenfan993/Study/tree/main/bluetooth/HCI)
 
 2. L2CAP (Logical Link Control and Adaptation Protocol)
+
+
+
 
 
 # Reference
