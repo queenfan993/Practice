@@ -1,17 +1,28 @@
 # hci_core.h
-- 位置 include/net/bluetooth/hci_core.h
+- 位置 ./include/net/bluetooth/hci_core.h
 
-## 實作 
-1. net/bluetoot/hci_core.c
-2. net/bluetoot/hci_conn.c
-3. net/bluetoot/sco.c
-4. net/bluetoot/l2cap.c
+## 巨集常數
+1. 
 
-## 內容
-1. HCI interface to upper protocols     807
-- l2cap
-- sco
-2. Inquiry cache                        827
+
+## 各類 struct 和 enum 和
+1. 
+
+
+
+
+## 函數實作位置 
+1. ./net/bluetoot/hci_core.c
+2. ./net/bluetoot/hci_conn.c
+
+
+## 函數類型
+### 1. HCI interface to upper protocols    (807)
+1. 函數定義在 ./net/bluetoot/l2cap_core.c
+- 包含 l2cap 的連線建立和中止，定義收到 acl 訊號時應該怎處裡
+2. 函數定義在 ./net/bluetoot/sco.c
+- 如果有傳統藍牙存在，定義連線和處理 sco 資料
+### 2. Inquiry cache                       (827)
 3. HCI Connections                      886
 4. HCI Devices                          1236
 5. LMP capabilities                     1428
