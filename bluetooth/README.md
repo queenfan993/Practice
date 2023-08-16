@@ -64,63 +64,42 @@ ref : https://hackmd.io/@AlienHackMd/rJHiN5S7o
 - 為上層和 link layer 的資料，在資料大小和佔用時間長度上面提供富有彈性的傳輸方式
 - 利用 fragmentation/recombination or segmentation/reassembly 的方式來讓上下溝通更有彈性
 
-Based on linux-5.19.0
-# hci_core.h
-- 位置 include/net/bluetooth/hci_core.h
+# Based on linux-5.19.0 kernel source code
+- 有了大致的架構概念，再來從 kenel 藍牙部份的 Makefile 觀察，上面的架構有哪些被包含
+- net/bluetooth/Makefile
+```
+# SPDX-License-Identifier: GPL-2.0
+#
+# Makefile for the Linux Bluetooth subsystem.
+#
 
-## 實作 
-1. net/bluetoot/hci_core.c
-2. net/bluetoot/hci_conn.c
-3. net/bluetoot/sco.c
-4. net/bluetoot/l2cap.c
+obj-$(CONFIG_BT)        += bluetooth.o
+obj-$(CONFIG_BT_RFCOMM) += rfcomm/
+obj-$(CONFIG_BT_BNEP)   += bnep/
+obj-$(CONFIG_BT_CMTP)   += cmtp/
+obj-$(CONFIG_BT_HIDP)   += hidp/
+obj-$(CONFIG_BT_6LOWPAN) += bluetooth_6lowpan.o
 
-## 內容
-1. HCI interface to upper protocols     807
-- l2cap
-- sco
-2. Inquiry cache                        827
-3. HCI Connections                      886
-4. HCI Devices                          1236
-5. LMP capabilities                     1428
-6. Extended LMP capabilities            1454
-7. Host capabilities                    1462
-8. HCI protocols                        1519
-9. HCI callbacks                        1547
-10. HCI Sockets                         1745
+bluetooth_6lowpan-y := 6lowpan.o
 
+bluetooth-y := af_bluetooth.o hci_core.o hci_conn.o hci_event.o mgmt.o \
+        hci_sock.o hci_sysfs.o l2cap_core.o l2cap_sock.o smp.o lib.o \
+        ecdh_helper.o hci_request.o mgmt_util.o mgmt_config.o hci_codec.o \
+        eir.o hci_sync.o
 
-# hci_core.c
-ref: https://blog.51cto.com/u_15314083/3190495
+bluetooth-$(CONFIG_BT_BREDR) += sco.o
+bluetooth-$(CONFIG_BT_HS) += a2mp.o amp.o
+bluetooth-$(CONFIG_BT_LEDS) += leds.o
+bluetooth-$(CONFIG_BT_MSFTEXT) += msft.o
+bluetooth-$(CONFIG_BT_AOSPEXT) += aosp.o
+bluetooth-$(CONFIG_BT_DEBUGFS) += hci_debugfs.o
+bluetooth-$(CONFIG_BT_SELFTEST) += selftest.o
+```
+- 大致區分成以下
+1. HCI (Host Controller Interface) device and connection manager, schedule
+- [hci_core.h](https://github.com/queenfan993/Study/tree/main/bluetooth/HCI)
 
-## hci_cmd_work
-```
-1. 使用 skb_dequeue 函數 hdev cmd_q 中取出一個數據包，並將其賦值給變數 skb
-2. res = hci_send_frame(hdev, skb); 將數據包 skb 透過 hdev 發送，並將結果存儲在變數 res 中判斷錯誤，做例外處理
-```
-## hci_rx_work
-```
-1. 從 hdev->rx_q 取數據
-2. switch (hci_skb_pkt_type(skb)) {
-        case HCI_EVENT_PKT: // 
-        case HCI_ACLDATA_PKT: //
-        case HCI_SCODATA_PKT: //
-```
-## hci_tx_work
-ref: https://blog.csdn.net/android_lover2014/article/details/88421594  
-ref: https://ithelp.ithome.com.tw/articles/10252873
-```
-1. 
-2. if (!hci_dev_test_flag(hdev, HCI_USER_CHANNEL)) {
-        /* Schedule queues and send stuff to HCI driver */
-        hci_sched_sco(hdev); //
-        hci_sched_esco(hdev); //
-        hci_sched_acl(hdev); //
-        hci_sched_le(hdev); // 
-    }
-```
-- SCO 同步鏈路，對稱連接，主從可以同時發送數據，主要用來傳輸對時間要求較高的數據，透過鏈接管理（LM）協議來確立鏈接，並且分配 time slot 等
-- ACL 異步，支援一對多，主設備決定代寬，從設備被選才能送，用未被分配的 slot 傳送，A2DP (Advanced Audio Distribution Profile) 跑在這上面
-- ESCO，動態調整 slot 大小，支援更多編碼，ㄋ支援資料的重傳
+2. L2CAP (Logical Link Control and Adaptation Protocol)
 
 
 # Reference
