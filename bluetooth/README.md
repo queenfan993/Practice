@@ -69,12 +69,14 @@ ref : https://hackmd.io/@AlienHackMd/rJHiN5S7o
 - ACL 異步，支援一對多，主設備決定代寬，從設備被選才能送，用未被分配的 slot 傳送，A2DP (Advanced Audio Distribution Profile) 跑在這上面
 - ESCO，動態調整 slot 大小，支援更多編碼，支援資料的重傳
 
-![bt link](./ref/link.png)
-ref : [Bluetooth Core Specification v5.4](https://www.bluetooth.com/specifications/specs/core-specification-5-4/)
-ref: https://www.twblogs.net/a/5b8dd3c72b7177188340e0c1  
-- 5.4 spec Vol1 partA 第三章
+
 
 # Physical Channel and Physical Link
+![bt link](./ref/link.png)
+ref : [Bluetooth Core Specification v5.4](https://www.bluetooth.com/specifications/specs/core-specification-5-4/) 
+- 5.4 spec Vol1 partA 第三章  
+ref: https://www.twblogs.net/a/5b8dd3c72b7177188340e0c1 
+
 - BR/EDR 佔用 79 個頻道，2.402 ~ 2.480 GHz，每個頻道 1 MHz，加上上下保護帶寬佔用 2.400 ~ 2.4835 GHz
 - LE 佔用 40 個頻道，每個 2 MHz，上下保護帶寬一樣，所以一樣是佔用 2.4 ~ 2.4835 GHz
 - 藍牙使用跳頻技術，傳送資料時不是總是使用同一個 channel 而是有規律的在各 channel 跳動
@@ -94,7 +96,7 @@ ref: https://blog.csdn.net/u010206565/article/details/118653061
 Inquiry
 - master 發送查詢請求，slave standby 時用更高的頻率進行 scan inquiry，成功收到後就能 response 請求
 - response 的內容包括設備 id 和時鐘等等 
-2. paging
+paging
 - 當 master inqrity 到範圍內有可連的設備時，可以對該特定設備進行連接
 - Example: On your phone (master), you select the Bluetooth Headphones (slave) to connect with
 ```
