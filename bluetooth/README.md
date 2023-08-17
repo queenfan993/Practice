@@ -71,7 +71,7 @@ ref : https://hackmd.io/@AlienHackMd/rJHiN5S7o
 
 
 
-# Physical Channel and Physical Link
+# Physical Channel
 ![bt link](./ref/link.png)
 ref : 5.4 spec Vol1 partA 第三章   
 ref: https://www.twblogs.net/a/5b8dd3c72b7177188340e0c1 
@@ -89,7 +89,7 @@ ref: https://www.twblogs.net/a/5b8dd3c72b7177188340e0c1
 - 用於藍牙設備的發現操作（discovery），即我們常用的搜索其它藍牙設備（discover）以及被其它藍牙設備搜索（discoverable）
 4. Page scan channel
 - 用於藍牙設備的連接操作（connect），即我們常用的連接其它藍牙設備（connect）以及被其它藍牙設備連接（connectable）
-* 說明 inquiry 和 paging 概念
+* 說明 inquiry 和 paging 概念  
 ref: https://blog.csdn.net/u010206565/article/details/118653061
 ```
 Inquiry
@@ -105,11 +105,32 @@ paging
 
 ## LE physical channels
 1. LE piconet physical channel
+- 通道 sets 透過 access address (a pseudo-random seqeunce of PHY channel)，和三個參數來確立
+- the sets fo channel, pseudo random number 和在確立連線之後第一個 data packet 送出的時間
+- central 在規律的時間間隔中發送 connection 的邀請，週邊設備可以接收到後可以 response
+- 其實就像 BR/EDR 的 adapted channel 的功能, 使用 37 個 LE piconet channels 
+- The Central can reduce this number through the channel map indicating the used channels
+
 2. Advertising physical channels
+- 主要用來建立設備連接，和事件的廣播
+- 兩種 adv 通道，可以是 primary 和 secondary
+- primary 可以使用三個鄰近的通道，或者使用更少
+- secondary 可使用固定的 37個通道，和 pico 使用相同的
+- primary 定義七種廣告事件, 另外還可能包含 PHY 通道和輔助數據包的開始時間偏移
+- secondary 的數據是 primary 的擴展數據，整個事件就像從 primary 起始開始，到 secondary 結束 
+
 3. Periodic physical channel
+- 對尚未連接的設備廣播用的通道
+- 可使用 37 channel，也可以減少
+
 4. LE Isochronous physical channel
-
-
+- 用來傳送等時的資料給連接上的 device
+- 可使用 37 channel，也可以減少
+ref : https://www.bluetooth.com/blog/10-frequently-asked-questions-on-le-isochronous-channels/
+```
+- LE Isochronous Channels are one of the key features introduced in Bluetooth Core Specification 5.2. LE Isochronous Channels
+- LE Isochronous Channels, along with Bluetooth profiles that are currently in development, will help enable Multi-Stream Audio and Broadcast Audio
+```
 
 # Based on linux-5.19.0 kernel source code
 - linux kernel code 跟藍牙相關的部份
