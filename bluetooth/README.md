@@ -73,8 +73,7 @@ ref : https://hackmd.io/@AlienHackMd/rJHiN5S7o
 
 # Physical Channel and Physical Link
 ![bt link](./ref/link.png)
-ref : [Bluetooth Core Specification v5.4](https://www.bluetooth.com/specifications/specs/core-specification-5-4/) 
-- 5.4 spec Vol1 partA 第三章  
+ref : 5.4 spec Vol1 partA 第三章   
 ref: https://www.twblogs.net/a/5b8dd3c72b7177188340e0c1 
 
 - BR/EDR 佔用 79 個頻道，2.402 ~ 2.480 GHz，每個頻道 1 MHz，加上上下保護帶寬佔用 2.400 ~ 2.4835 GHz
