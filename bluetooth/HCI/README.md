@@ -24,11 +24,17 @@
 - 其他函數實作 ./net/bluetoot/hci_conn.c
 
 ### 4. HCI Devices                          (1236)
+1. 向下提供 driver 註冊和 release hci dev
+2. 向上給 socket 提供對 hci_dev 進行 open 或 close 等操作，進行檢查看可否開啟，以便後續藍牙通信
+3. 提供根據地址查詢藍牙設備訊息，with irk or with flag，connection 的狀態
+ref: [address with irk](http://www.wowotech.net/bluetooth/ble_address_type.html)
+4. 對於 irk 和 ltk(long-term-key) 的加入和查找 
+- 函數實作 ./net/bluetoot/hci_core.c 
+
+### 5. LMP capabilities                     1428
 1. 
 
 
-
-### 5. LMP capabilities                     1428
 ### 6. Extended LMP capabilities            1454
 ### 7. Host capabilities                    1462
 ### 8. HCI protocols                        1519

@@ -4,17 +4,17 @@ ref : [Bluetooth Core Specification v5.4](https://www.bluetooth.com/specificatio
 - BR/EDR : L2CAP, SDP and GAP blocks
 - LE : L2CAP, SMP, Attribute Protocol, GAP and Generic Attribute Profile (GATT) blocks
 - 透過 HCI (Host Controller Interface) 溝通 host 和藍牙 controller ，為兩者提供複數界面的接口 (uart，usb ...)
-- 藍牙控制器的 buffer 有限，在 L2CAP 提供排程，將 SDU (service) 切割成 PDU (protocol) 形成起始或是連續封包來配合 buffer 大小
-- ARQ 和一些選定的功能，例如錯誤檢測和重傳或者 window-based flow control 都可以在傳統藍牙使用，LE 則不見得
+- 藍牙協議可以大致分成：物理層（Physical Layer）、邏輯層（Logical Layer）、L2CAP Layer 和應用層（APP Layer）
 
-![bt architecture](./ref/arch.png)
+![bt architecture](./ref/arch1.png)
 # Host Architectural Blocks
 1. Channel Manager
 - 用來創建，管理，和刪除 L2CAP 通道，和其他對等設備的 channel manager 溝通也可以向下和本地的 link manager 配置新的鏈接達成 QoS
 - 可以理解為 link 是物理上的鏈接，實際的藍牙連線，所以一條 link 可以多個 channel 來傳輸不同的數據類型
 
 2. L2CAP Resource Manager
-- 管理 PDU 和 SDU 來配合 buffer 或者可用的 slot 大小，或者符合 QoS
+- 藍牙控制器的 buffer 有限，在 L2CAP 提供排程
+- 管理 LE controller 的 PDU 和 SDU 來配合 buffer 或者可用的 slot 大小，或者符合 QoS
 - PDU 是最小傳輸單位，SDU 是包含更多協定控制數據和應用數據，可以被分成多個 PDU 片段
 
 3. Security Manager Protocol
@@ -63,6 +63,52 @@ ref : https://hackmd.io/@AlienHackMd/rJHiN5S7o
 6. Isochronous Adaptation Layer
 - 為上層和 link layer 的資料，在資料大小和佔用時間長度上面提供富有彈性的傳輸方式
 - 利用 fragmentation/recombination or segmentation/reassembly 的方式來讓上下溝通更有彈性
+
+7. SCO 和 ACL
+- SCO 同步鏈路，對稱連接，主從可以同時發送數據，主要用來傳輸對時間要求較高的數據，透過鏈接管理（LM）協議來確立鏈接，並且分配 time slot 等
+- ACL 異步，支援一對多，主設備決定代寬，從設備被選才能送，用未被分配的 slot 傳送，A2DP (Advanced Audio Distribution Profile) 跑在這上面
+- ESCO，動態調整 slot 大小，支援更多編碼，支援資料的重傳
+
+![bt link](./ref/link.png)
+ref : [Bluetooth Core Specification v5.4](https://www.bluetooth.com/specifications/specs/core-specification-5-4/)
+ref: https://www.twblogs.net/a/5b8dd3c72b7177188340e0c1  
+- 5.4 spec Vol1 partA 第三章
+
+# Physical Channel and Physical Link
+- BR/EDR 佔用 79 個頻道，2.402 ~ 2.480 GHz，每個頻道 1 MHz，加上上下保護帶寬佔用 2.400 ~ 2.4835 GHz
+- LE 佔用 40 個頻道，每個 2 MHz，上下保護帶寬一樣，所以一樣是佔用 2.4 ~ 2.4835 GHz
+- 藍牙使用跳頻技術，傳送資料時不是總是使用同一個 channel 而是有規律的在各 channel 跳動
+
+## BR/EDR physical channels
+1. Basic Piconet Physical Channel
+- 用在處於連接狀態的藍牙設備之間的通信，使用全部 79 個通道跳頻
+2. Adapted piconet channel
+- 用在處於連接狀態的藍牙設備之間的通信，使用較少的跳頻點，表示干擾較多，根據通道狀態，選擇跳頻子集
+3. Inquiry scan channel
+- 用於藍牙設備的發現操作（discovery），即我們常用的搜索其它藍牙設備（discover）以及被其它藍牙設備搜索（discoverable）
+4. Page scan channel
+- 用於藍牙設備的連接操作（connect），即我們常用的連接其它藍牙設備（connect）以及被其它藍牙設備連接（connectable）
+* 說明 inquiry 和 paging 概念
+ref: https://blog.csdn.net/u010206565/article/details/118653061
+```
+Inquiry
+- master 發送查詢請求，slave standby 時用更高的頻率進行 scan inquiry，成功收到後就能 response 請求
+- response 的內容包括設備 id 和時鐘等等 
+2. paging
+- 當 master inqrity 到範圍內有可連的設備時，可以對該特定設備進行連接
+- Example: On your phone (master), you select the Bluetooth Headphones (slave) to connect with
+```
+5. Synchronization scan channel
+- 用於得到廣播信號的資訊，包括 timing 和使用的 channel
+
+
+## LE physical channels
+1. LE piconet physical channel
+2. Advertising physical channels
+3. Periodic physical channel
+4. LE Isochronous physical channel
+
+
 
 # Based on linux-5.19.0 kernel source code
 - linux kernel code 跟藍牙相關的部份
