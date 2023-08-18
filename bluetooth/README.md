@@ -190,7 +190,7 @@ iii. hci_event.c
 iv. hci_sock.c  
 - 給應用程式透過 socket 來訪問 HCI，實做 hci_sock_ops 提供接口讓 struct socket 的 ops 指向它
 
-2. L2CAP (Logical Link Control and Adaptation Protocol)
+2. L2CAP (Logical Link Control and Adaptation Protocol)  
 i. l2cap_core.c
 - 執行 l2cap_init_sockets 和透過 hci_register_cb 向下接口  
 ii. l2cap_sock.c 
