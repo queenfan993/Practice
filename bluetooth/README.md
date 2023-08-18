@@ -125,11 +125,11 @@ paging
 
 4. LE Isochronous physical channel
 - 用來傳送等時的資料給連接上的 device
-- 可使用 37 channel，也可以減少
+- 可使用 37 channel，也可以減少  
 ref : https://www.bluetooth.com/blog/10-frequently-asked-questions-on-le-isochronous-channels/
 ```
-- LE Isochronous Channels are one of the key features introduced in Bluetooth Core Specification 5.2. LE Isochronous Channels
-- LE Isochronous Channels, along with Bluetooth profiles that are currently in development, will help enable Multi-Stream Audio and Broadcast Audio
+- LE Isochronous Channels are one of the key features introduced in Bluetooth Core Specification 5.2.
+- LE Isochronous Channels, along with Bluetooth profiles will help enable Multi-Stream Audio and Broadcast Audio
 ```
 
 # Based on linux-5.19.0 kernel source code
@@ -149,7 +149,7 @@ linux ---- include
               ---- bluetooth : modules
 ```
 - 有了大致的架構概念，首先從核心藍牙系統的 Makefile 觀察實際實作有哪些大的 block 
-- net/bluetooth/Makefile
+- ./net/bluetooth/Makefile
 ```
 # SPDX-License-Identifier: GPL-2.0
 #
@@ -180,12 +180,33 @@ bluetooth-$(CONFIG_BT_SELFTEST) += selftest.o
 ```
 - 大致區分成以下
 1. HCI (Host Controller Interface) device and connection manager, schedule
-- [hci_core.h](https://github.com/queenfan993/Study/tree/main/bluetooth/HCI)
+- [hci_core.h](https://github.com/queenfan993/Study/tree/main/bluetooth/HCI): 定義 hci 函數和 sturct，函數主要實作在以下檔案
+i. hci_core.c  
+- 提供上層發送和接收 sco, acl, cmd 等數據包接口 
+ii. hci_conn.c  
+- 管理 sturct hci_dev 裡面關於 conn 和 channel 變數的部份，一個 conn 可能由多個 channel 組成 
+iii. hci_event.c  
+- 解析事件，事件處理，狀態更新，定義 struct hci_ev 和 hci_ev_table，table 裡面對應函數和事件
+iv. hci_sock.c  
+- 給應用程式透過 socket 來訪問 HCI，實做 hci_sock_ops 提供接口讓 struct socket 的 ops 指向它
 
 2. L2CAP (Logical Link Control and Adaptation Protocol)
 
+i. l2cap_core.c  
+- 執行 l2cap_init_sockets 和透過 hci_register_cb 向下接口
+ii. l2cap_sock.c  
+- 透過 bt_sock_register 提供應用程式接口
 
+3. SCO 
+- bt_sock_register 和 hci_register_cb 提供向上和向下接口
 
+4. mgmt
+i. mgmt.c  
+- 
+ii. 
+- 
+iii.
+- 
 
 
 # Reference
