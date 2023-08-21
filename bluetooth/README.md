@@ -10,7 +10,6 @@ ref : [Bluetooth Core Specification v5.4](https://www.bluetooth.com/specificatio
 # Host Architectural Blocks
 1. Channel Manager
 - 用來創建，管理，和刪除 L2CAP 通道，和其他對等設備的 channel manager 溝通也可以向下和本地的 link manager 配置新的鏈接達成 QoS
-- 可以理解為 link 是物理上的鏈接，實際的藍牙連線，所以一條 link 可以多個 channel 來傳輸不同的數據類型
 
 2. L2CAP Resource Manager
 - 藍牙控制器的 buffer 有限，在 L2CAP 提供排程
@@ -37,9 +36,9 @@ ref : https://hackmd.io/@AlienHackMd/rJHiN5S7o
 
 # BR/EDR/LE Controller architectural blocks
 1. Device Manager
-- 跟設備連入藍牙系統相關，也透過 HCI commands 管理已經進入系統的設備 (name, key...)
-- inquiring for the presence of nearby Bluetooth devices, connecting to Bluetooth devices
-- making the local Bluetooth device discoverable or connectable
+- 跟設備連入藍牙系統相關，透過 HCI commands 管理已經進入系統的設備 (name, key...)
+- 並不直接管理詢問或者藍牙設備可以被周遭設備發現等
+- 發現只跟傳統藍牙相關
 
 2. Link Manager
 - 建立修改和釋放 logical links，也可以修改兩個設備的實體連線的參數

@@ -32,9 +32,6 @@ ref: [address with irk](http://www.wowotech.net/bluetooth/ble_address_type.html)
 - 函數實作 ./net/bluetoot/hci_core.c 
 
 ### 5. LMP capabilities                     1428
-1. 
-
-
 ### 6. Extended LMP capabilities            1454
 ### 7. Host capabilities                    1462
 ### 8. HCI protocols                        1519
